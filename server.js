@@ -20,7 +20,8 @@ const main = async () => {
     // Main loop until user selects 'Exit Application'
     while(!finished){
         clearConsole();
-        
+
+                
         const {choice} = await promptMain();
 
         if(choice === 'Exit Application'){
@@ -28,9 +29,9 @@ const main = async () => {
         }else if(choice === 'View all Departments'){
             viewDepartments();
         }else if(choice === 'View all Roles'){
-            
+            viewRoles();
         }else if(choice === 'View all Employees'){
-            //await promptEngineer();
+            viewEmployees();
         }else if(choice === 'Add a Department'){
             //await promptEngineer();
         }
@@ -55,33 +56,71 @@ const promptMain = async () => {
      {
          type: 'list',
          name: 'choice',
-         message: '\n\nWhat would you like to do?\n',
+         message: '\nWhat would you like to do?\n',
          choices: ['View all Departments', 'View all Roles', 'View all Employees', 'Add a Department', 'Add a Role', 'Add an Employee', 'Update an Employee Role', 'Exit Application'],
      }
      ])
 }
 
-const viewDepartments = () => {
-    db.query(`SELECT * FROM department`, (err, result) => {
+function viewDepartments(){
+    db.query(`SELECT department.id AS 'ID', department.d_name AS 'Dept. Name' FROM department`, (err, result) => {
         if (err) {
             console.log(err);
         }
 
         clearConsole();
 
-        console.log('[Departments]\n');
+        console.log('\n[Departments]\n');
         console.table(result);
-        console.log('(Press up or down to show the menu)');
+        console.log('(Press up or down to show the main menu)');
+    });
+}
+
+function viewRoles(){
+    db.query(`SELECT roles.id AS 'ID', roles.title AS 'Title', CONCAT('$', FORMAT(roles.salary, 0)) AS 'Salary', roles.department_id AS 'Dept. ID', department.d_name AS 'Dept. Name' from roles JOIN department ON roles.department_id = department.id`, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+
+        clearConsole();
+
+        console.log('\n[Roles]\n');
+        console.table(result);
+        console.log('(Press up or down to show the main menu)');
+    });
+}
+
+function viewEmployees(){
+    const sql = `select e.id ID, 
+    CONCAT(e.first_name, ' ', e.last_name) Name, 
+    roles.title Role, 
+    CONCAT(m.first_name, ' ', m.last_name) Manager 
+    FROM 
+    employee e 
+    JOIN 
+    roles ON e.role_id = roles.id
+    LEFT JOIN
+    employee m ON m.id = e.manager_id` ;
+
+    // const sql = `select employee.id AS 'ID', CONCAT(employee.first_name, ' ', employee.last_name) AS 'Name', roles.title AS 'Role' from employee JOIN roles ON employee.role_id = roles.id`;
+    db.query(sql, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+
+        clearConsole();
+
+        console.log('\n[Employees]\n');
+        console.table(result);
+        console.log('(Press up or down to show the main menu)');
     });
 }
 
 function clearConsole() {
-    process.stdout.write("\u001b[3J\u001b[2J\u001b[1J");console.clear();
+    console.clear();
+    //process.stdout.write('\033c'); // Clears screen, not prompt
+    //process.stdout.write('\033[2J'); // Clears screen, including prompt
 }
-
-console.reset = function () {
-    return process.stdout.write('\033c\033[3J');
-  }
 
 main();
 
