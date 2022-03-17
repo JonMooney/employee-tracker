@@ -59,7 +59,7 @@ const main = async () => {
 }
 
 // Main questions for loop
-const promptMain = async () => {
+async function promptMain(){
     return inquirer.prompt([
      {
          type: 'list',
@@ -70,22 +70,20 @@ const promptMain = async () => {
      ])
 }
 
-function viewDepartments(){
-    db.query(`SELECT department.id AS 'ID', department.d_name AS 'Dept. Name' FROM department`, (err, result) => {
-        if (err) {
-            console.log(err);
-        }
+async function viewDepartments (){
+    let sql = `SELECT department.id AS 'ID', department.d_name AS 'Dept. Name' FROM department`;
+    
+    const result = await db.promise().query(sql);
 
-        clearConsole();
+    clearConsole();
 
-        console.log('\n[Departments]\n');
-        console.table(result);
-        console.log('(Press up or down to show the main menu)');
-    });
+    console.log('\n[Departments]\n');
+    console.table(result[0]);
+    console.log('(Press up or down to show the main menu)');
 }
 
-function viewRoles(){
-    const sql = `SELECT roles.id AS 'ID', 
+async function viewRoles(){
+    let sql = `SELECT roles.id AS 'ID', 
     roles.title AS 'Title', 
     department.d_name AS 'Dept. Name', 
     CONCAT('$', FORMAT(roles.salary, 0)) AS 'Salary' 
@@ -93,21 +91,17 @@ function viewRoles(){
     JOIN department ON roles.department_id = department.id
     ORDER BY roles.title`;
 
-    db.query(sql, (err, result) => {
-        if (err) {
-            console.log(err);
-        }
+    const result = await db.promise().query(sql);
 
-        clearConsole();
+    clearConsole();
 
-        console.log('\n[Roles]\n');
-        console.table(result);
-        console.log('(Press up or down to show the main menu)');
-    });
+    console.log('\n[Roles]\n');
+    console.table(result[0]);
+    console.log('(Press up or down to show the main menu)');
 }
 
-function viewEmployees(){
-    const sql = `select e.id ID, 
+async function viewEmployees(){
+    let sql = `select e.id ID, 
     CONCAT(e.first_name, ' ', e.last_name) Name, 
     roles.title Role, 
     department.d_name AS 'Dept.',  
@@ -118,20 +112,16 @@ function viewEmployees(){
     LEFT JOIN department ON department.id = roles.department_id 
     LEFT JOIN employee m ON m.id = e.manager_id`;
 
-    db.query(sql, (err, result) => {
-        if (err) {
-            console.log(err);
-        }
+    const result = await db.promise().query(sql);
 
-        clearConsole();
+    clearConsole();
 
-        console.log('\n[Employees]\n');
-        console.table(result);
-        console.log('(Press up or down to show the main menu)');
-    });
+    console.log('\n[Employees]\n');
+    console.table(result[0]);
+    console.log('(Press up or down to show the main menu)');
 }
 
-const addDept = async () => {
+async function addDept(){
     return inquirer.prompt([
         {
             type: 'input',
@@ -155,22 +145,19 @@ const addDept = async () => {
     });
 }
 
-const addRole = async () => {
+async function addRole(){
     let ids = []
     let names = []
    
-    db.query(`SELECT * FROM department`, (err, result) => {
-        if (err) {
-            console.log(err);
-        }
-        
-        result.forEach(obj => {
-            ids.push(obj.id)
-            names.push(obj.d_name)  
-          })
+    let sql = `SELECT * FROM department`;
+    let result = await db.promise().query(sql);
 
-    });
-
+    // First array position is the array of objects
+    result[0].forEach(obj => {
+        ids.push(obj.id);
+        names.push(obj.d_name);
+    })
+    
     return inquirer.prompt([
         {
             type: 'input',
@@ -221,35 +208,31 @@ const addRole = async () => {
     });
 }
 
-const addEmployee = async () => {
+async function addEmployee(){
     let role_ids = [];
     let roles = [];
     let manager_ids = [];
     let managers = [];
    
-    db.query(`SELECT * FROM roles`, (err, result) => {
-        if (err) {
-            console.log(err);
-        }
-        
-        result.forEach(obj => {
-            role_ids.push(obj.id);
-            roles.push(obj.title);
-        })
-    });
+    let sql = `SELECT * FROM roles`;
+    let result = await db.promise().query(sql);
 
-    db.query(`SELECT * FROM employee`, (err, result) => {
-        if (err) {
-            console.log(err);
+    // First array position is the array of objects
+    result[0].forEach(obj => {
+        role_ids.push(obj.id);
+        roles.push(obj.title);
+    })
+
+    sql = `SELECT * FROM employee`;
+    result = await db.promise().query(sql);
+
+    // First array position is the array of objects
+    result[0].forEach(obj => {
+        if(obj.manager_id === null){
+            manager_ids.push(obj.id);
+            managers.push(obj.first_name + ' ' + obj.last_name);
         }
-        
-        result.forEach(obj => {
-            if(obj.manager_id === null){
-                manager_ids.push(obj.id);
-                managers.push(obj.first_name + ' ' + obj.last_name);
-            }
-        })
-    });
+    })
 
     return inquirer.prompt([
         {
@@ -315,34 +298,30 @@ const addEmployee = async () => {
     });
 }
 
-const roleUpdate = async () => {
+async function roleUpdate(){
     let role_ids = [];
     let roles = [];
     let employee_ids = [];
     let employees = [];
    
-    db.query(`SELECT * FROM roles`, (err, result) => {
-        if (err) {
-            console.log(err);
-        }
-        
-        result.forEach(obj => {
-            role_ids.push(obj.id);
-            roles.push(obj.title);
-        })
-    });
+    let sql = `SELECT * FROM roles`;
+    let result = await db.promise().query(sql);
+    
+    // First array position is the array of objects
+    result[0].forEach(obj => {
+        role_ids.push(obj.id);
+        roles.push(obj.title);
+    })
 
-    db.query(`SELECT * FROM employee`, (err, result) => {
-        if (err) {
-            console.log(err);
-        }
-        
-        result.forEach(obj => {
-            employee_ids.push(obj.id);
-            employees.push(obj.first_name + ' ' + obj_last_name);
-        })
-    });
+    sql = `SELECT * FROM employee`;
+    result = await db.promise().query(sql);
 
+    // First array position is the array of objects
+    result[0].forEach(obj => {
+        employee_ids.push(obj.id);
+        employees.push(obj.first_name + ' ' + obj.last_name);
+    })
+    
     return inquirer.prompt([
         {
             type: 'list',
@@ -352,11 +331,19 @@ const roleUpdate = async () => {
         },
         {
             type: 'list',
-            name: 'employee',
+            name: 'role',
             message: `\nWhat role should this employee belong to?\n`,
             choices: roles
         }
     ]).then(data => {
+        let employee_id;
+        for(let a=0;a<employees.length;a++){
+            if(employees[a] === data.employee){
+                employee_id = employee_ids[a];
+                break;
+            }
+        }
+        
         let role_id;
         for(let a=0;a<roles.length;a++){
             if(roles[a] === data.role){
@@ -365,15 +352,11 @@ const roleUpdate = async () => {
             }
         }
 
-        let manager_id;
-        for(let a=0;a<managers.length;a++){
-            if(managers[a] === data.manager){
-                manager_id = manager_ids[a];
-                break;
-            }
-        }
+        let sql = `UPDATE employee 
+        SET role_id = ${parseInt(role_id)} 
+        WHERE id = ${parseInt(employee_id)}`;
 
-        db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${data.first}', '${data.last}', ${parseInt(role_id)}, ${parseInt(manager_id)})`, (err, result) => {
+        db.query(sql, (err, result) => {
             if (err) {
                 console.log(err);
             }
