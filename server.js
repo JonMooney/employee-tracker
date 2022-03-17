@@ -129,12 +129,12 @@ async function addDept(){
         {
             type: 'input',
             name: 'name',
-            message: '\nWhat is the name of the department?',
+            message: 'What is the name of the department?',
             validate: input => {
                 if (input) {
                     return true;
                 } else {
-                    console.log(' Please enter the department name!');
+                    console.log('Please enter the department name!');
                     return false;
                 }
             }
@@ -167,12 +167,12 @@ async function addRole(){
         {
             type: 'input',
             name: 'name',
-            message: '\nWhat is the name of the role?',
+            message: 'What is the name of the role?',
             validate: input => {
                 if (input) {
                     return true;
                 } else {
-                    console.log(' Please enter the role name!');
+                    console.log('Please enter the role name!');
                     return false;
                 }
             }
@@ -180,12 +180,12 @@ async function addRole(){
         {
             type: 'input',
             name: 'salary',
-            message: '\nWhat is the salary of the role?',
+            message: 'What is the salary of the role?',
             validate: input => {
                 if (input) {
                     return true;
                 } else {
-                    console.log(' Please enter the salary of the role!');
+                    console.log('Please enter the salary of the role!');
                     return false;
                 }
             }
@@ -193,7 +193,7 @@ async function addRole(){
         {
             type: 'list',
             name: 'choice',
-            message: '\nWhich department does the role belong to?\n',
+            message: 'Which department does the role belong to?\n',
             choices: names
         }
     ]).then(data => {
@@ -244,12 +244,12 @@ async function addEmployee(){
         {
             type: 'input',
             name: 'first',
-            message: `\nWhat is the employee's first name?`,
+            message: `What is the employee's first name?`,
             validate: input => {
                 if (input) {
                     return true;
                 } else {
-                    console.log(` Please enter the employee's first  name!`);
+                    console.log(`Please enter the employee's first  name!`);
                     return false;
                 }
             }
@@ -257,12 +257,12 @@ async function addEmployee(){
         {
             type: 'input',
             name: 'last',
-            message: `\nWhat is the employee's last name?`,
+            message: `What is the employee's last name?`,
             validate: input => {
                 if (input) {
                     return true;
                 } else {
-                    console.log(` Please enter the employee's last name!`);
+                    console.log(`Please enter the employee's last name!`);
                     return false;
                 }
             }
@@ -270,13 +270,13 @@ async function addEmployee(){
         {
             type: 'list',
             name: 'role',
-            message: `\nWhat is the employee's role?\n`,
+            message: `What is the employee's role?\n`,
             choices: roles
         },
         {
             type: 'list',
             name: 'manager',
-            message: `\nWho is the employee's manager?\n`,
+            message: `Who is the employee's manager?\n`,
             choices: managers
         }
     ]).then(data => {
@@ -334,13 +334,13 @@ async function roleUpdate(){
         {
             type: 'list',
             name: 'employee',
-            message: `\nWhich employee's role would you like to update?\n`,
+            message: `Which employee's role would you like to update?\n`,
             choices: employees
         },
         {
             type: 'list',
             name: 'role',
-            message: `\nWhat role should this employee belong to?\n`,
+            message: `What role should this employee belong to?\n`,
             choices: roles
         }
     ]).then(data => {
