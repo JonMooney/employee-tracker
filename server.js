@@ -19,8 +19,7 @@ let finished = false;
 const main = async () => {
     // Main loop until user selects 'Exit Application'
     while(!finished){
-        clearConsole();
-
+        console.clear();
                 
         const {choice} = await promptMain();
 
@@ -70,18 +69,20 @@ async function promptMain(){
      ])
 }
 
+// View all departments
 async function viewDepartments (){
     let sql = `SELECT department.id AS 'ID', department.d_name AS 'Dept. Name' FROM department`;
     
     const result = await db.promise().query(sql);
 
-    clearConsole();
+    console.clear();
 
     console.log('\n[Departments]\n');
     console.table(result[0]);
     console.log('(Press up or down to show the main menu)');
 }
 
+// View Roles
 async function viewRoles(){
     let sql = `SELECT roles.id AS 'ID', 
     roles.title AS 'Title', 
@@ -93,13 +94,14 @@ async function viewRoles(){
 
     const result = await db.promise().query(sql);
 
-    clearConsole();
+    console.clear();
 
     console.log('\n[Roles]\n');
     console.table(result[0]);
     console.log('(Press up or down to show the main menu)');
 }
 
+// View all Employees
 async function viewEmployees(){
     let sql = `select e.id ID, 
     CONCAT(e.first_name, ' ', e.last_name) Name, 
@@ -114,13 +116,14 @@ async function viewEmployees(){
 
     const result = await db.promise().query(sql);
 
-    clearConsole();
+    console.clear();
 
     console.log('\n[Employees]\n');
     console.table(result[0]);
     console.log('(Press up or down to show the main menu)');
 }
 
+// Add a department
 async function addDept(){
     return inquirer.prompt([
         {
@@ -137,6 +140,7 @@ async function addDept(){
             }
         }
     ]).then(data => {
+        // Insert response from inquirer into database
         db.query(`INSERT INTO department (d_name) VALUES ('${data.name}')`, (err, result) => {
             if (err) {
                 console.log(err);
@@ -145,6 +149,7 @@ async function addDept(){
     });
 }
 
+// Add a role
 async function addRole(){
     let ids = []
     let names = []
@@ -199,7 +204,7 @@ async function addRole(){
                 break;
             }
         }
-
+        // Insert response from inquirer into database
         db.query(`INSERT INTO roles (title, salary, department_id) VALUES ('${data.name}', ${parseInt(data.salary)}, ${parseInt(dep_id)})`, (err, result) => {
             if (err) {
                 console.log(err);
@@ -208,6 +213,7 @@ async function addRole(){
     });
 }
 
+// Add employee
 async function addEmployee(){
     let role_ids = [];
     let roles = [];
@@ -290,6 +296,7 @@ async function addEmployee(){
             }
         }
 
+        // Insert response from inquirer into database
         db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${data.first}', '${data.last}', ${parseInt(role_id)}, ${parseInt(manager_id)})`, (err, result) => {
             if (err) {
                 console.log(err);
@@ -298,13 +305,14 @@ async function addEmployee(){
     });
 }
 
+// Update employee role
 async function roleUpdate(){
     let role_ids = [];
     let roles = [];
     let employee_ids = [];
     let employees = [];
    
-    let sql = `SELECT * FROM roles`;
+    let sql = `SELECT * FROM roles ORDER BY title`;
     let result = await db.promise().query(sql);
     
     // First array position is the array of objects
@@ -356,6 +364,7 @@ async function roleUpdate(){
         SET role_id = ${parseInt(role_id)} 
         WHERE id = ${parseInt(employee_id)}`;
 
+        // Insert response from inquirer into database
         db.query(sql, (err, result) => {
             if (err) {
                 console.log(err);
@@ -364,14 +373,8 @@ async function roleUpdate(){
     });
 }
 
-
-// Helper Functions
-function clearConsole() {
-    console.clear();
-    //process.stdout.write('\033c'); // Clears screen, not prompt
-    //process.stdout.write('\033[2J'); // Clears screen, including prompt
-}
-
+// Helper Function
+// Used to display a message until returning to the main menu
 function pause(milliseconds) {
 	var dt = new Date();
 	while ((new Date()) - dt <= milliseconds) { /* Do nothing */ }
